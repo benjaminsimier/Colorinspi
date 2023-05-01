@@ -62,6 +62,10 @@
 import { notification } from 'ant-design-vue'
 import axios from 'axios'
 
+useHead({
+  titleTemplate: 'Colorinspi',
+})
+
 const colorToUse = ref({ name: 'golden', code: 'eed3a1' })
 
 const createColor = async () => {

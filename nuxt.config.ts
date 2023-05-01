@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      titleTemplate: '%s - Test',
+      titleTemplate: '%s - Colorinspi',
       title: 'Home',
     },
   },
