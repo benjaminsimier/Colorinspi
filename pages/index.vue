@@ -183,7 +183,7 @@ watch(colorToUse, () => {
 })
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.code === 'Space' && !loading) {
+  if (event.code === 'Space') {
     changeColor()
   }
 }
