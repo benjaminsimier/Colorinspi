@@ -15,7 +15,7 @@
         >
           <div
             v-if="previousColor"
-            class="absolute left-[-80px] top-[50%] flex h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all"
+            class="absolute left-[-80px] top-[50%] hidden h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all md:flex"
             :class="{
               '!opacity-100': previousColorActive,
               '!cursor-pointer': previousColorActive,
@@ -59,7 +59,7 @@
           >
             Generate a new color
           </a-button>
-          <div class="mt-3 select-none text-xs opacity-50">
+          <div class="mt-3 hidden select-none text-xs opacity-50 md:block">
             Or press the Spacebar to generate new color
           </div>
         </div>
@@ -98,7 +98,6 @@ useHead({
   titleTemplate: 'Colorinspi',
 })
 
-// const colorToUse = ref({ name: 'golden', code: 'eed3a1' })
 const colorToUse = ref({ name: '', code: '' })
 const previousColor = ref({ name: '', code: '' })
 const previousColorActive = ref(false)
@@ -147,8 +146,6 @@ const changeColor = () => {
 onMounted(() => {
   createColor()
   window.addEventListener('keydown', handleKeyDown)
-
-  // previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
 })
 
 onUnmounted(() => {
