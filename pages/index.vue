@@ -17,11 +17,13 @@
             class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
             :style="{ backgroundColor: '#' + colorToUse.code }"
           ></div>
-          <div class="absolute bottom-[10px] left-[50%] translate-x-[-50%]">
+          <div
+            class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
+          >
             #{{ colorToUse.code }}
           </div>
         </div>
-        <div class="mt-8 flex w-full justify-center gap-6">
+        <div class="mt-8 w-full justify-center gap-6">
           <a-button
             type="primary"
             :size="size"
@@ -30,6 +32,9 @@
           >
             Generate a new color
           </a-button>
+          <div class="mt-3 select-none text-xs opacity-50">
+            Or press the Spacebar to generate new color
+          </div>
         </div>
       </div>
     </div>
@@ -101,7 +106,18 @@ const changeColor = () => {
 
 onMounted(() => {
   createColor()
+  window.addEventListener('keydown', handleKeyDown)
 })
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.code === 'Space') {
+    changeColor()
+  }
+}
 
 const copyToClipboard = async () => {
   try {
