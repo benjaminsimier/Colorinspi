@@ -85,7 +85,9 @@
       </div>
     </div>
 
-    <div class="absolute bottom-5 right-5 flex gap-2">
+    <div
+      class="absolute bottom-5 w-full gap-2 text-center md:right-5 md:flex md:w-auto"
+    >
       <div>
         This interface use the
         <a
@@ -95,7 +97,7 @@
           >Colr API</a
         >
       </div>
-      <div class="opacity-70">-</div>
+      <div class="hidden opacity-70 md:block">-</div>
       <div>
         Project on
         <a
