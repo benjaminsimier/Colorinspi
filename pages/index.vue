@@ -9,18 +9,45 @@
             >Colorinspi</a
           >'s color generator
         </div>
+
         <div
-          class="scale-1 relative mx-auto h-[280px] w-[250px] cursor-pointer rounded-md bg-white shadow-md active:scale-[98%]"
-          @click="copyToClipboard"
+          class="relative mx-auto h-[280px] w-[250px] cursor-pointer rounded-md bg-white shadow-md"
         >
           <div
-            class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
-            :style="{ backgroundColor: '#' + colorToUse.code }"
-          ></div>
-          <div
-            class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
+            v-if="previousColor"
+            class="absolute left-[-80px] top-[50%] flex h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all"
+            :class="{
+              '!opacity-100': previousColorActive,
+              '!cursor-pointer': previousColorActive,
+            }"
+            @click="previousColorActive ? usePreviousColor() : null"
           >
-            #{{ colorToUse.code }}
+            <a-tooltip
+              v-if="previousColorActive"
+              title="Previous color"
+              color="#7b6dc4"
+              placement="left"
+              mouseEnterDelay="0.7"
+            >
+              <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+            </a-tooltip>
+            <div v-else>
+              <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+            </div>
+          </div>
+          <div
+            class="scale-1 relative mx-auto h-[280px] w-[250px] active:scale-[98%]"
+            @click="copyToClipboard"
+          >
+            <div
+              class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
+              :style="{ backgroundColor: '#' + colorToUse.code }"
+            ></div>
+            <div
+              class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
+            >
+              #{{ colorToUse.code }}
+            </div>
           </div>
         </div>
         <div class="mt-8 w-full justify-center gap-6">
@@ -71,7 +98,10 @@ useHead({
   titleTemplate: 'Colorinspi',
 })
 
-const colorToUse = ref({ name: 'golden', code: 'eed3a1' })
+// const colorToUse = ref({ name: 'golden', code: 'eed3a1' })
+const colorToUse = ref({ name: '', code: '' })
+const previousColor = ref({ name: '', code: '' })
+const previousColorActive = ref(false)
 
 const createColor = async () => {
   try {
@@ -88,6 +118,15 @@ const createColor = async () => {
     ) {
       const code = color.colors[0].hex
       const name = color.colors[0].tags[0].name
+
+      localStorage.setItem(
+        'previousColor',
+        JSON.stringify({
+          name: colorToUse.value.name,
+          code: colorToUse.value.code,
+        })
+      )
+
       colorToUse.value = {
         name,
         code,
@@ -101,16 +140,23 @@ const createColor = async () => {
 }
 
 const changeColor = () => {
+  previousColorActive.value = true
   createColor()
 }
 
 onMounted(() => {
   createColor()
   window.addEventListener('keydown', handleKeyDown)
+
+  // previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
+})
+
+watch(colorToUse, () => {
+  previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
 })
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -138,6 +184,17 @@ const copyToClipboard = async () => {
       duration: 3,
       closeIcon: false,
     })
+  }
+}
+
+const usePreviousColor = () => {
+  const code = previousColor.value.code
+  const name = previousColor.value.name
+
+  previousColorActive.value = false
+  colorToUse.value = {
+    name,
+    code,
   }
 }
 </script>
