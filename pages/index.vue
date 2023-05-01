@@ -11,55 +11,74 @@
         </div>
 
         <div
-          class="relative mx-auto h-[280px] w-[250px] cursor-pointer rounded-md bg-white shadow-md"
+          class="relative mx-auto h-[280spx] w-[250px] cursor-pointer rounded-md bg-white shadow-md"
         >
-          <div
-            v-if="previousColor"
-            class="absolute left-[-80px] top-[50%] hidden h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all md:flex"
-            :class="{
-              '!opacity-100': previousColorActive,
-              '!cursor-pointer': previousColorActive,
-            }"
-            @click="previousColorActive ? usePreviousColor() : null"
-          >
-            <a-tooltip
-              v-if="previousColorActive"
-              title="Previous color"
-              color="#7b6dc4"
-              placement="left"
-              mouseEnterDelay="0.7"
+          <div v-if="!loading">
+            <div
+              v-if="previousColor"
+              class="absolute left-[-80px] top-[50%] hidden h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all md:flex"
+              :class="{
+                '!opacity-100': previousColorActive,
+                '!cursor-pointer': previousColorActive,
+              }"
+              @click="previousColorActive ? usePreviousColor() : null"
             >
-              <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
-            </a-tooltip>
-            <div v-else>
-              <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+              <a-tooltip
+                v-if="previousColorActive"
+                title="Previous color"
+                color="#7b6dc4"
+                placement="left"
+                mouseEnterDelay="0.7"
+              >
+                <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+              </a-tooltip>
+              <div v-else>
+                <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+              </div>
+            </div>
+
+            <div
+              class="scale-1 relative mx-auto h-[280px] w-[250px] active:scale-[98%]"
+              @click="copyToClipboard"
+            >
+              <div
+                class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
+                :style="{ backgroundColor: '#' + colorToUse.code }"
+              ></div>
+              <div
+                class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
+              >
+                #{{ colorToUse.code }}
+              </div>
             </div>
           </div>
-          <div
-            class="scale-1 relative mx-auto h-[280px] w-[250px] active:scale-[98%]"
-            @click="copyToClipboard"
-          >
+
+          <div v-else class="relative mx-auto h-[280px] w-[250px]">
             <div
-              class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
-              :style="{ backgroundColor: '#' + colorToUse.code }"
+              class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md bg-primary transition-all"
             ></div>
             <div
               class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
             >
-              #{{ colorToUse.code }}
+              Loading
             </div>
           </div>
         </div>
+
         <div class="mt-8 w-full justify-center gap-6">
           <a-button
             type="primary"
             :size="size"
-            class="!w-[220px] !rounded-sm !border-0 !bg-primary"
-            @click="changeColor"
+            class="!w-[220px] !rounded-sm !border-0 !bg-primary opacity-100"
+            :class="{ 'opacity-25': loading, '!cursor-default': loading }"
+            @click="!loading ? changeColor() : null"
           >
             Generate a new color
           </a-button>
-          <div class="mt-3 hidden select-none text-xs opacity-50 md:block">
+          <div
+            class="mt-3 hidden select-none text-xs opacity-50 transition-all md:block"
+            :class="{ '!opacity-0': loading }"
+          >
             Or press the Spacebar to generate new color
           </div>
         </div>
@@ -101,6 +120,8 @@ useHead({
 const colorToUse = ref({ name: '', code: '' })
 const previousColor = ref({ name: '', code: '' })
 const previousColorActive = ref(false)
+
+const loading = ref(true)
 
 const createColor = async () => {
   try {
@@ -154,10 +175,13 @@ onUnmounted(() => {
 
 watch(colorToUse, () => {
   previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
+  if (colorToUse.value.code) {
+    loading.value = false
+  }
 })
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.code === 'Space') {
+  if (event.code === 'Space' && !loading) {
     changeColor()
   }
 }
