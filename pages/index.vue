@@ -43,12 +43,13 @@
             >
               <div
                 class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
-                :style="{ backgroundColor: '#' + colorToUse.code }"
+                :style="{ backgroundColor: colorToUse.code }"
               ></div>
+
               <div
                 class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
               >
-                #{{ colorToUse.code }}
+                {{ colorToUse.code }}
               </div>
             </div>
           </div>
@@ -91,10 +92,10 @@
       <div>
         This interface use the
         <a
-          href="https://www.colr.org/api.html"
+          href="https://www.thecolorapi.com"
           target="_blank"
           rel="noopener noreferrer"
-          >Colr API</a
+          >THE<span class="font-bold">COLOR</span>API</a
         >
       </div>
       <div class="hidden opacity-70 md:block">-</div>
@@ -126,20 +127,17 @@ const previousColorActive = ref(false)
 const loading = ref(true)
 
 const createColor = async () => {
+  loading.value = true
+
   try {
     const response = await axios.get(
-      'https://www.colr.org/json/color/random?timestamp=' + Date.now()
+      'https://www.thecolorapi.com/random?timestamp=' + Date.now()
     )
     const color = response.data
 
-    if (
-      color.colors &&
-      color.colors[0] &&
-      color.colors[0].tags &&
-      color.colors[0].tags[0]
-    ) {
-      const code = color.colors[0].hex
-      const name = color.colors[0].tags[0].name
+    if (color) {
+      const code = color.hex.value
+      const name = color.name
 
       localStorage.setItem(
         'previousColor',
@@ -159,6 +157,8 @@ const createColor = async () => {
   } catch (error) {
     console.error(error)
   }
+
+  loading.value = false
 }
 
 const changeColor = () => {
@@ -167,7 +167,12 @@ const changeColor = () => {
 }
 
 onMounted(() => {
-  createColor()
+  if (process.client) {
+    previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
+    createColor()
+  }
+
+  // createColor()
   window.addEventListener('keydown', handleKeyDown)
 })
 
@@ -190,7 +195,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 const copyToClipboard = async () => {
   try {
-    await navigator.clipboard.writeText('#' + colorToUse.value.code)
+    await navigator.clipboard.writeText(colorToUse.value.code)
 
     notification['success']({
       message: 'Copied to Clipboard!',
