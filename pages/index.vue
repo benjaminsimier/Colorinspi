@@ -69,7 +69,6 @@
         <div class="mt-8 w-full justify-center gap-6">
           <a-button
             type="primary"
-            :size="size"
             class="!w-[220px] !rounded-sm !border-0 !bg-primary opacity-100"
             :class="{ 'opacity-25': loading, '!cursor-default': loading }"
             @click="!loading ? changeColor() : null"
@@ -138,6 +137,14 @@ const createColor = async () => {
     if (color) {
       const code = color.hex.value
       const name = color.name
+
+      localStorage.setItem(
+        'currentColor',
+        JSON.stringify({
+          name,
+          code,
+        })
+      )
 
       localStorage.setItem(
         'previousColor',
