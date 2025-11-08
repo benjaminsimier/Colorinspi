@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
+    '@pinia/nuxt',
   ],
 
   // components: https://go.nuxtjs.dev/config-components

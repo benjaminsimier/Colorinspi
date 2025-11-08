@@ -10,60 +10,121 @@
           >'s color generator
         </div>
 
-        <div
-          class="relative mx-auto h-[280spx] w-[250px] cursor-pointer rounded-md bg-white shadow-md"
-        >
-          <div v-if="!loading">
+        <div class="flex gap-4">
+          <!-- LEFT -->
+          <div class="flex w-[60px] flex-col items-center justify-center gap-4">
+            <!-- HISTORY -->
             <div
-              v-if="previousColor"
-              class="absolute left-[-80px] top-[50%] hidden h-[50px] w-[50px] translate-y-[-50%] cursor-default select-none items-center justify-center rounded-full border border-primary opacity-25 transition-all md:flex"
-              :class="{
-                '!opacity-100': previousColorActive,
-                '!cursor-pointer': previousColorActive,
-              }"
-              @click="previousColorActive ? usePreviousColor() : null"
+              class="h-[50px] w-[50px] select-none items-center justify-center rounded-full border border-primary transition-all md:flex"
+              :class="
+                userColorStore.history.length > 1
+                  ? '!cursor-pointer !opacity-100'
+                  : '!cursor-default opacity-25'
+              "
+              @click="
+                userColorStore.history.length > 1
+                  ? (historyModalVisible = true)
+                  : null
+              "
             >
               <a-tooltip
-                v-if="previousColorActive"
-                title="Previous color"
+                title="Color History"
                 color="#7b6dc4"
-                placement="left"
-                mouseEnterDelay="0.7"
+                placement="top"
+                mouseEnterDelay="0.5"
               >
-                <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+                <history-outlined style="color: #7b6dc4; font-size: 20px" />
               </a-tooltip>
-              <div v-else>
-                <rollback-outlined style="color: #7b6dc4; font-size: 20px" />
+            </div>
+
+            <!-- FAVORITES -->
+            <div
+              class="h-[50px] w-[50px] cursor-pointer select-none items-center justify-center rounded-full border border-primary opacity-100 transition-all md:flex"
+              @click="favoritesModalVisible = true"
+            >
+              <a-tooltip
+                title="Favorites"
+                color="#7b6dc4"
+                placement="top"
+                mouseEnterDelay="0.5"
+              >
+                <appstore-add-outlined
+                  style="color: #7b6dc4; font-size: 20px"
+                />
+              </a-tooltip>
+            </div>
+          </div>
+
+          <!-- COLOR -->
+          <div
+            class="relative mx-auto h-[280spx] w-[250px] rounded-md bg-white shadow-md"
+          >
+            <div v-if="!loading" class="relative">
+              <!-- ADD TO FAVORITES -->
+              <div class="absolute right-[20px] top-[20px] z-20">
+                <a-tooltip
+                  :title="
+                    userColorStore.favorites
+                      .map((f) => f.code)
+                      .indexOf(colorToUse.code) === -1
+                      ? 'Add to favorites'
+                      : 'Remove from favorites'
+                  "
+                  color="#7b6dc4"
+                  placement="top"
+                  mouseEnterDelay="0.5"
+                >
+                  <heart-outlined
+                    v-if="
+                      userColorStore.favorites
+                        .map((f) => f.code)
+                        .indexOf(colorToUse.code) === -1
+                    "
+                    @click.stop="addToFavorites"
+                    style="color: #7b6dc4; font-size: 20px"
+                  />
+
+                  <heart-filled
+                    v-else
+                    @click.stop="removeFromFavorites(colorToUse)"
+                    style="color: #7b6dc4; font-size: 20px"
+                  />
+                </a-tooltip>
+              </div>
+
+              <div
+                class="scale-1 relative mx-auto h-[280px] w-[250px] cursor-pointer active:scale-[98%]"
+                @click="copyToClipboard"
+              >
+                <div
+                  class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
+                  :style="{ backgroundColor: colorToUse.code }"
+                ></div>
+
+                <div
+                  class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
+                >
+                  {{ colorToUse.code }}
+                </div>
               </div>
             </div>
 
-            <div
-              class="scale-1 relative mx-auto h-[280px] w-[250px] active:scale-[98%]"
-              @click="copyToClipboard"
-            >
+            <div v-else class="relative mx-auto h-[280px] w-[250px]">
               <div
-                class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md transition-all"
-                :style="{ backgroundColor: colorToUse.code }"
+                class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md bg-primary transition-all"
               ></div>
-
               <div
                 class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
               >
-                {{ colorToUse.code }}
+                Loading
               </div>
             </div>
           </div>
 
-          <div v-else class="relative mx-auto h-[280px] w-[250px]">
-            <div
-              class="absolute left-[50%] top-[50%] h-[230px] w-[230px] translate-x-[-50%] translate-y-[calc(-50%-15px)] rounded-md bg-primary transition-all"
-            ></div>
-            <div
-              class="absolute bottom-[10px] left-[50%] translate-x-[-50%] select-none"
-            >
-              Loading
-            </div>
-          </div>
+          <!-- RIGHT -->
+          <div
+            class="flex w-[60px] flex-col items-center justify-center gap-4"
+          ></div>
         </div>
 
         <div class="mt-8 w-full justify-center gap-6">
@@ -108,90 +169,138 @@
         >
       </div>
     </div>
+
+    <!-- HISTORY -->
+    <a-modal
+      v-model:visible="historyModalVisible"
+      :footer="null"
+      title="Color History"
+      centered
+      width="1000px"
+      @ok="historyModalVisible = false"
+    >
+      <div class="grid h-96 grid-cols-12 gap-2 overflow-scroll">
+        <div
+          v-for="color in userColorStore.history.slice().reverse()"
+          :key="color.code"
+          class="col-span-2"
+        >
+          <div
+            class="flex aspect-square w-full cursor-pointer items-center justify-center rounded-md border border-primary transition-all hover:bg-primary hover:text-white"
+            :style="{ backgroundColor: color.code }"
+            @click="useHistoryColor(color)"
+          >
+            <div class="flex flex-col items-center gap-1">
+              <div class="text-sm">{{ color.name }}</div>
+              <div class="text-xs">{{ color.code }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a-modal>
+
+    <!-- FAVORITES -->
+    <a-modal
+      v-model:visible="favoritesModalVisible"
+      :footer="null"
+      title="Favorites"
+      centered
+      width="1000px"
+      @ok="favoritesModalVisible = false"
+    >
+      <div class="grid h-96 grid-cols-12 gap-2 overflow-scroll">
+        <div
+          v-for="color in userColorStore.favorites.slice().reverse()"
+          :key="color.code"
+          class="col-span-2"
+        >
+          <div
+            class="relative flex aspect-square w-full cursor-pointer items-center justify-center rounded-md border border-primary transition-all hover:bg-primary hover:text-white"
+            :style="{ backgroundColor: color.code }"
+            @click="useFavorite(color)"
+          >
+            <!-- ADD TO FAVORITES -->
+            <div class="absolute right-[8px] top-[8px] z-20">
+              <a-tooltip
+                title="Add to favorites"
+                color="#7b6dc4"
+                placement="top"
+                mouseEnterDelay="0.5"
+              >
+                <delete-outlined
+                  @click.stop="removeFromFavorites(color)"
+                  style="color: #7b6dc4; font-size: 20px"
+                />
+              </a-tooltip>
+            </div>
+
+            <div class="flex flex-col items-center gap-1">
+              <div class="text-sm">{{ color.name }}</div>
+              <div class="text-xs">{{ color.code }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { notification } from 'ant-design-vue'
-import axios from 'axios'
 
 useHead({
   titleTemplate: 'Colorinspi',
 })
 
+const userColorStore = useUserColorStore()
+
 const colorToUse = ref({ name: '', code: '' })
-const previousColor = ref({ name: '', code: '' })
-const previousColorActive = ref(false)
+const isFavorite = ref(false)
+
+const historyModalVisible = ref(false)
+const favoritesModalVisible = ref(false)
 
 const loading = ref(true)
 
 const createColor = async () => {
   loading.value = true
 
-  try {
-    const response = await axios.get(
-      'https://www.thecolorapi.com/random?timestamp=' + Date.now()
-    )
-    const color = response.data
+  await userColorStore.getCurrentColor()
 
-    if (color) {
-      const code = color.hex.value
-      const name = color.name
-
-      localStorage.setItem(
-        'currentColor',
-        JSON.stringify({
-          name,
-          code,
-        })
-      )
-
-      localStorage.setItem(
-        'previousColor',
-        JSON.stringify({
-          name: colorToUse.value.name,
-          code: colorToUse.value.code,
-        })
-      )
-
-      colorToUse.value = {
-        name,
-        code,
-      }
-    } else {
-      return createColor()
-    }
-  } catch (error) {
-    console.error(error)
+  colorToUse.value = {
+    name: userColorStore.currentColor.name,
+    code: userColorStore.currentColor.code,
   }
 
   loading.value = false
 }
 
 const changeColor = () => {
-  previousColorActive.value = true
   createColor()
 }
 
 onMounted(() => {
-  if (process.client) {
-    previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
+  loading.value = true
+
+  if (userColorStore.currentColor.code) {
+    colorToUse.value = {
+      name: userColorStore.currentColor.name,
+      code: userColorStore.currentColor.code,
+    }
+  } else {
     createColor()
   }
 
-  // createColor()
+  if (userColorStore.history.length > 0) {
+  }
+
+  loading.value = false
+
   window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
-})
-
-watch(colorToUse, () => {
-  previousColor.value = JSON.parse(localStorage.getItem('previousColor'))
-  if (colorToUse.value.code) {
-    loading.value = false
-  }
 })
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -222,14 +331,38 @@ const copyToClipboard = async () => {
   }
 }
 
-const usePreviousColor = () => {
-  const code = previousColor.value.code
-  const name = previousColor.value.name
-
-  previousColorActive.value = false
+const useHistoryColor = (color: any) => {
   colorToUse.value = {
-    name,
-    code,
+    name: color.name,
+    code: color.code,
   }
+
+  historyModalVisible.value = false
+}
+
+const useFavorite = (color: any) => {
+  colorToUse.value = {
+    name: color.name,
+    code: color.code,
+  }
+
+  favoritesModalVisible.value = false
+}
+
+const addToFavorites = () => {
+  // check if color is already in favorites
+  const isFavorite = userColorStore.favorites.some(
+    (favorite) => favorite.code === colorToUse.value.code
+  )
+
+  if (isFavorite) {
+    return
+  }
+
+  userColorStore.addToFavorites(colorToUse.value)
+}
+
+const removeFromFavorites = (color: any) => {
+  userColorStore.removeFromFavorites(color)
 }
 </script>
