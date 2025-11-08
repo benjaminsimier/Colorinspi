@@ -156,30 +156,6 @@
       </div>
     </div>
 
-    <!-- <div
-      class="absolute bottom-5 w-full gap-2 text-center md:right-5 md:flex md:w-auto"
-    >
-      <div>
-        This interface use the
-        <a
-          href="https://www.thecolorapi.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          >THE<span class="font-bold">COLOR</span>API</a
-        >
-      </div>
-      <div class="hidden opacity-70 md:block">-</div>
-      <div>
-        Project on
-        <a
-          href="https://github.com/benjaminsimier/Colorinspi"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Github</a
-        >
-      </div>
-    </div> -->
-
     <!-- HISTORY -->
     <a-modal
       v-model:visible="historyModalVisible"
