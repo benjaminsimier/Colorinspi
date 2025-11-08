@@ -17,17 +17,8 @@
           >
             <!-- HISTORY -->
             <div
-              class="flex h-[50px] w-[50px] select-none items-center justify-center rounded-full border border-primary transition-all"
-              :class="
-                userColorStore.history.length > 1
-                  ? '!cursor-pointer !opacity-100'
-                  : '!cursor-default opacity-25'
-              "
-              @click="
-                userColorStore.history.length > 1
-                  ? (historyModalVisible = true)
-                  : null
-              "
+              class="flex h-[50px] w-[50px] !cursor-pointer select-none items-center justify-center rounded-full border border-primary !opacity-100 transition-all"
+              @click="historyModalVisible = true"
             >
               <a-tooltip
                 title="Color History"
@@ -227,7 +218,10 @@
       width="1000px"
       @ok="favoritesModalVisible = false"
     >
-      <div class="grid h-96 grid-cols-12 gap-2 overflow-scroll">
+      <div
+        v-if="userColorStore.favorites.length"
+        class="grid h-96 grid-cols-12 gap-2 overflow-scroll"
+      >
         <div
           v-for="color in userColorStore.favorites.slice().reverse()"
           :key="color.code"
@@ -260,6 +254,10 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div v-else class="flex h-96 items-center justify-center">
+        No favorite color yet
       </div>
     </a-modal>
 
@@ -402,12 +400,12 @@ const useMatchingColor = async (color: any) => {
 
   if (!isHistory) {
     color.matchingColors = await userColorStore.getAllColorSchemes(color.code)
+
+    // Add to history
+    userColorStore.addToHistory(color)
   }
 
   colorToUse.value = color
-
-  // Add to history
-  userColorStore.addToHistory(color)
 
   matchingColorsModalVisible.value = false
 }
