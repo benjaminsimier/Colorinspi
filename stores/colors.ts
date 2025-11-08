@@ -50,6 +50,11 @@ export const useUserColorStore = defineStore('userColor', {
       }
     },
 
+    setCurrentColor(color: any) {
+      this.currentColor = color
+      this.saveToStorage()
+    },
+
     addToFavorites(color: any) {
       this.favorites.push(color)
       this.saveToStorage()

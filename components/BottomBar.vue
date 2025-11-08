@@ -4,18 +4,128 @@
       class="fixed bottom-0 left-0 z-50 w-full border-t border-slate-200 bg-white py-4"
     >
       <div class="container">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <!-- NEW -->
-            <div>
-              <a-button type="primary" :loading="loading" @click="createColor">
-                <template #icon>
-                  <LoadingOutlined v-if="loading" />
-                  <PlusOutlined v-else />
-                </template>
-              </a-button>
+        <div class="grid grid-cols-3 items-center justify-between">
+          <div class="flex items-center justify-start gap-2">
+            <!-- GENERATE -->
+            <div class="mr-4">
+              <a-tooltip
+                title="Generate Color"
+                color="#7b6dc4"
+                placement="top"
+                mouse-enter-delay="0.5"
+              >
+                <a-button
+                  type="primary"
+                  :loading="loading"
+                  @click="createColor"
+                >
+                  <template #icon>
+                    <LoadingOutlined v-if="loading" />
+                    <PlusOutlined v-else />
+                  </template>
+                </a-button>
+              </a-tooltip>
             </div>
 
+            <!-- HISTORY -->
+            <div>
+              <a-tooltip
+                title="Color History"
+                color="#7b6dc4"
+                placement="top"
+                mouse-enter-delay="0.5"
+              >
+                <a-button
+                  type="secondary"
+                  :loading="loading"
+                  @click="historyModalVisible = true"
+                >
+                  <template #icon>
+                    <LoadingOutlined v-if="loading" />
+                    <HistoryOutlined v-else />
+                  </template>
+                </a-button>
+              </a-tooltip>
+            </div>
+
+            <!-- FAVORITES -->
+            <div>
+              <a-tooltip
+                title="Favorites"
+                color="#7b6dc4"
+                placement="top"
+                mouse-enter-delay="0.5"
+              >
+                <a-button
+                  type="secondary"
+                  :loading="loading"
+                  @click="favoritesModalVisible = true"
+                >
+                  <template #icon>
+                    <LoadingOutlined v-if="loading" />
+                    <AppstoreAddOutlined v-else />
+                  </template>
+                </a-button>
+              </a-tooltip>
+            </div>
+
+            <!-- MATCHING COLORS -->
+            <div>
+              <a-tooltip
+                title="Matching Colors"
+                color="#7b6dc4"
+                placement="top"
+                mouse-enter-delay="0.5"
+              >
+                <a-button
+                  type="secondary"
+                  :loading="loading"
+                  @click="matchingColorsModalVisible = true"
+                >
+                  <template #icon>
+                    <LoadingOutlined v-if="loading" />
+                    <EditOutlined v-else />
+                  </template>
+                </a-button>
+              </a-tooltip>
+            </div>
+
+            <!-- ADD TO FAVORITES -->
+            <div class="ml-4">
+              <a-tooltip
+                :title="
+                  userColorStore.favorites
+                    .map((f) => f.code)
+                    .indexOf(colorToUse.code) === -1
+                    ? 'Add to favorites'
+                    : 'Remove from favorites'
+                "
+                color="#7b6dc4"
+                placement="top"
+                mouse-enter-delay="0.5"
+              >
+                <a-button type="secondary" :loading="loading">
+                  <template #icon>
+                    <HeartOutlined
+                      v-if="
+                        userColorStore.favorites
+                          .map((f) => f.code)
+                          .indexOf(colorToUse.code) === -1
+                      "
+                      @click="addToFavorites"
+                    />
+
+                    <HeartFilled
+                      v-else
+                      @click="removeFromFavorites(colorToUse)"
+                    />
+                  </template>
+                </a-button>
+              </a-tooltip>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-center gap-2">
             <div
               class="h-8 w-8 rounded-md border"
               :style="{ backgroundColor: colorToUse.code }"
@@ -34,7 +144,7 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center justify-end gap-2">
             <!-- TEMPLATE -->
             <div>
               <a-button type="secondary" @click="templatesModalVisible = true">
@@ -238,10 +348,59 @@ const useColorMode = (mode: string) => {
   colorModesModalVisible.value = false
 }
 
-const useHistoryColor = (color: any) => {}
+const useHistoryColor = (color: any) => {
+  colorToUse.value = color
 
-const useFavorite = (color: any) => {}
-const removeFromFavorites = (color: any) => {}
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
 
-const useMatchingColor = (color: any) => {}
+  historyModalVisible.value = false
+}
+
+const useFavorite = (color: any) => {
+  colorToUse.value = color
+
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
+
+  favoritesModalVisible.value = false
+}
+
+const useMatchingColor = async (color: any) => {
+  // check if color is already in history
+  const isHistory = userColorStore.history.some(
+    (history) => history.code === color.code
+  )
+
+  if (!isHistory) {
+    color.matchingColors = await userColorStore.getAllColorSchemes(color.code)
+
+    // Add to history
+    userColorStore.addToHistory(color)
+  }
+
+  colorToUse.value = color
+
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
+
+  matchingColorsModalVisible.value = false
+}
+
+const addToFavorites = () => {
+  // check if color is already in favorites
+  const isFavorite = userColorStore.favorites.some(
+    (favorite) => favorite.code === colorToUse.value.code
+  )
+
+  if (isFavorite) {
+    return
+  }
+
+  userColorStore.addToFavorites(colorToUse.value)
+}
+
+const removeFromFavorites = (color: any) => {
+  userColorStore.removeFromFavorites(color)
+}
 </script>
