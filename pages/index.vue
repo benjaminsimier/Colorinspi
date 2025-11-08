@@ -207,6 +207,10 @@ const createColor = async () => {
 
   await userColorStore.getCurrentColor()
 
+  if (!userColorStore?.settings?.mode) {
+    userColorStore.getSettings('monochrome')
+  }
+
   colorToUse.value = userColorStore.currentColor
 
   loading.value = false
