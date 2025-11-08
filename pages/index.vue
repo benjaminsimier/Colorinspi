@@ -17,23 +17,14 @@
           >
             <!-- HISTORY -->
             <div
-              class="flex h-[50px] w-[50px] select-none items-center justify-center rounded-full border border-primary transition-all"
-              :class="
-                userColorStore.history.length > 1
-                  ? '!cursor-pointer !opacity-100'
-                  : '!cursor-default opacity-25'
-              "
-              @click="
-                userColorStore.history.length > 1
-                  ? (historyModalVisible = true)
-                  : null
-              "
+              class="flex h-[50px] w-[50px] !cursor-pointer select-none items-center justify-center rounded-full border border-primary !opacity-100 transition-all"
+              @click="historyModalVisible = true"
             >
               <a-tooltip
                 title="Color History"
                 color="#7b6dc4"
                 placement="top"
-                mouseEnterDelay="0.5"
+                mouse-enter-delay="0.5"
               >
                 <history-outlined style="color: #7b6dc4; font-size: 20px" />
               </a-tooltip>
@@ -48,7 +39,7 @@
                 title="Favorites"
                 color="#7b6dc4"
                 placement="top"
-                mouseEnterDelay="0.5"
+                mouse-enter-delay="0.5"
               >
                 <appstore-add-outlined
                   style="color: #7b6dc4; font-size: 20px"
@@ -65,7 +56,7 @@
                 title="Matching Colors"
                 color="#7b6dc4"
                 placement="top"
-                mouseEnterDelay="0.5"
+                mouse-enter-delay="0.5"
               >
                 <edit-outlined style="color: #7b6dc4; font-size: 20px" />
               </a-tooltip>
@@ -89,7 +80,7 @@
                   "
                   color="#7b6dc4"
                   placement="top"
-                  mouseEnterDelay="0.5"
+                  mouse-enter-delay="0.5"
                 >
                   <heart-outlined
                     v-if="
@@ -165,144 +156,50 @@
       </div>
     </div>
 
-    <!-- <div
-      class="absolute bottom-5 w-full gap-2 text-center md:right-5 md:flex md:w-auto"
-    >
-      <div>
-        This interface use the
-        <a
-          href="https://www.thecolorapi.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          >THE<span class="font-bold">COLOR</span>API</a
-        >
-      </div>
-      <div class="hidden opacity-70 md:block">-</div>
-      <div>
-        Project on
-        <a
-          href="https://github.com/benjaminsimier/Colorinspi"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Github</a
-        >
-      </div>
-    </div> -->
-
     <!-- HISTORY -->
-    <a-modal
-      v-model:visible="historyModalVisible"
-      :footer="null"
-      title="Color History"
-      centered
-      width="1000px"
-      @ok="historyModalVisible = false"
-    >
-      <div class="grid h-96 grid-cols-12 gap-2 overflow-scroll">
-        <div
-          v-for="color in userColorStore.history.slice().reverse()"
-          :key="color.code"
-          class="col-span-12 transition-all sm:col-span-3 lg:col-span-2"
-        >
-          <div
-            class="flex aspect-square w-full cursor-pointer items-center justify-center rounded-md border transition-all hover:bg-primary"
-            :style="{ backgroundColor: color.code, color: color.text }"
-            @click="useHistoryColor(color)"
-          >
-            <div class="flex flex-col items-center gap-1">
-              <div class="text-sm">{{ color.name }}</div>
-              <div class="text-xs">{{ color.code }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a-modal>
+    <ModalHistory
+      v-model:historyModalVisible="historyModalVisible"
+      :data="userColorStore"
+      @useHistoryColor="useHistoryColor"
+    />
 
     <!-- FAVORITES -->
-    <a-modal
-      v-model:visible="favoritesModalVisible"
-      :footer="null"
-      title="Favorites"
-      centered
-      width="1000px"
-      @ok="favoritesModalVisible = false"
-    >
-      <div class="grid h-96 grid-cols-12 gap-2 overflow-scroll">
-        <div
-          v-for="color in userColorStore.favorites.slice().reverse()"
-          :key="color.code"
-          class="col-span-12 transition-all sm:col-span-3 lg:col-span-2"
-        >
-          <div
-            class="group relative flex aspect-square w-full cursor-pointer items-center justify-center rounded-md border transition-all hover:bg-primary"
-            :style="{ backgroundColor: color.code, color: color.text }"
-            @click="useFavorite(color)"
-          >
-            <div
-              class="absolute right-[8px] top-[8px] z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white opacity-0 transition-all group-hover:opacity-100"
-            >
-              <a-tooltip
-                title="Remove from favorites"
-                color="#7b6dc4"
-                placement="top"
-                mouseEnterDelay="0.5"
-              >
-                <delete-outlined
-                  @click.stop="removeFromFavorites(color)"
-                  style="color: #7b6dc4; font-size: 18px"
-                />
-              </a-tooltip>
-            </div>
-
-            <div class="flex flex-col items-center gap-1">
-              <div class="text-sm">{{ color.name }}</div>
-              <div class="text-xs">{{ color.code }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a-modal>
+    <ModalFavorites
+      v-model:favoritesModalVisible="favoritesModalVisible"
+      :data="userColorStore"
+      @useFavorite="useFavorite"
+      @removeFromFavorites="removeFromFavorites"
+    />
 
     <!-- MATCHING COLORS -->
-    <a-modal
-      v-model:visible="matchingColorsModalVisible"
-      :footer="null"
-      title="Matching Colors"
-      centered
-      width="550px"
-      @ok="matchingColorsModalVisible = false"
+    <ModalMatchingColor
+      v-model:matchingColorsModalVisible="matchingColorsModalVisible"
+      :data="colorToUse"
+      @useMatchingColor="useMatchingColor"
+    />
+
+    <!-- FLOATING CTA: DISCOVER TEMPLATES (New Feature) -->
+    <div
+      class="fixed bottom-6 right-6 z-50 transition-transform duration-300 hover:scale-[1.03]"
+      title="See examples and templates using these colors."
     >
-      <div class="h-96 overflow-scroll">
-        <div class="flex flex-col gap-4">
-          <div v-for="(mode, key) in colorToUse.matchingColors" :key="key">
-            <div class="mb-2 text-lg font-bold capitalize">{{ key }}</div>
-            <div class="grid grid-cols-12 gap-2">
-              <div
-                v-for="color in mode"
-                :key="color.code"
-                class="col-span-12 transition-all sm:col-span-6 lg:col-span-4"
-              >
-                <div
-                  class="flex aspect-square w-full cursor-pointer items-center justify-center rounded-md border transition-all hover:bg-primary"
-                  :style="{ backgroundColor: color.code, color: color.text }"
-                  @click="useMatchingColor(color)"
-                >
-                  <div class="flex flex-col items-center gap-1">
-                    <div class="text-sm">{{ color.name }}</div>
-                    <div class="text-xs">{{ color.code }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div
+        class="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow-xl transition-all hover:bg-indigo-700"
+        @click="goToTemplate"
+      >
+        <!-- Using LayoutOutlined (Ant Design Icon) for template/design concept -->
+        <layout-outlined style="font-size: 16px" />
+        Discover Templates
       </div>
-    </a-modal>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { notification } from 'ant-design-vue'
+
+// Assuming required Ant Design icons (like LayoutOutlined) are available globally
+// or imported elsewhere in the setup script if needed.
 
 useHead({
   titleTemplate: 'Colorinspi',
@@ -327,6 +224,10 @@ const createColor = async () => {
   loading.value = true
 
   await userColorStore.getCurrentColor()
+
+  if (!userColorStore?.settings?.mode) {
+    userColorStore.getSettings('monochrome')
+  }
 
   colorToUse.value = userColorStore.currentColor
 
@@ -385,11 +286,17 @@ const copyToClipboard = async () => {
 const useHistoryColor = (color: any) => {
   colorToUse.value = color
 
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
+
   historyModalVisible.value = false
 }
 
 const useFavorite = (color: any) => {
   colorToUse.value = color
+
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
 
   favoritesModalVisible.value = false
 }
@@ -402,12 +309,15 @@ const useMatchingColor = async (color: any) => {
 
   if (!isHistory) {
     color.matchingColors = await userColorStore.getAllColorSchemes(color.code)
+
+    // Add to history
+    userColorStore.addToHistory(color)
   }
 
   colorToUse.value = color
 
-  // Add to history
-  userColorStore.addToHistory(color)
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
 
   matchingColorsModalVisible.value = false
 }
@@ -427,5 +337,9 @@ const addToFavorites = () => {
 
 const removeFromFavorites = (color: any) => {
   userColorStore.removeFromFavorites(color)
+}
+
+const goToTemplate = () => {
+  navigateTo('/templates/landing')
 }
 </script>

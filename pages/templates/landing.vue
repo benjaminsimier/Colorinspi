@@ -1,5 +1,13 @@
 <template>
-  <div :style="{ '--brand-color': currentColor }">
+  <div
+    :style="{
+      '--brand-color': currentColor.code,
+      // Pulling accents from the active scheme array
+      '--accent-1': activeScheme[0] ? activeScheme[0].code : '#3b82f6',
+      '--accent-2': activeScheme[1] ? activeScheme[1].code : '#4f46e5',
+      '--accent-3': activeScheme[2] ? activeScheme[2].code : '#1e40af',
+    }"
+  >
     <!-- =========== Header =========== -->
     <header
       class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-slate-50/80 backdrop-blur-lg"
@@ -7,35 +15,37 @@
       <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
           <div class="flex-shrink-0">
-            <a href="#" class="brand-text text-2xl font-bold">
+            <a href="/" class="brand-text text-2xl font-bold">
               ✨ ColorInspi
             </a>
           </div>
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
+              <!-- Using Accent 1 for nav link hover -->
               <a
                 href="#features"
-                class="hover-brand rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
+                class="hover-accent-1 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
                 >Features</a
               >
               <a
                 href="#testimonials"
-                class="hover-brand rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
+                class="hover-accent-1 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
                 >Testimonials</a
               >
               <a
                 href="#pricing"
-                class="hover-brand rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
+                class="hover-accent-1 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
                 >Pricing</a
               >
               <a
                 href="#"
-                class="hover-brand rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
+                class="hover-accent-1 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors"
                 >Contact</a
               >
             </div>
           </div>
           <div class="hidden md:block">
+            <!-- Primary CTA uses brand-bg and brand-dark hover (now controlled by Accent 3) -->
             <a
               href="#"
               class="brand-bg hover-brand-dark inline-block rounded-md px-4 py-2 text-sm font-medium text-white transition-all duration-200"
@@ -92,24 +102,25 @@
         class="md:hidden"
       >
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+          <!-- Using Accent 1 for mobile menu hover -->
           <a
             href="#features"
-            class="hover-brand block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
+            class="hover-accent-1 block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
             >Features</a
           >
           <a
             href="#testimonials"
-            class="hover-brand block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
+            class="hover-accent-1 block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
             >Testimonials</a
           >
           <a
             href="#pricing"
-            class="hover-brand block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
+            class="hover-accent-1 block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
             >Pricing</a
           >
           <a
             href="#"
-            class="hover-brand block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
+            class="hover-accent-1 block rounded-md px-3 py-2 text-base font-medium text-slate-600 transition-colors hover:bg-slate-200"
             >Contact</a
           >
         </div>
@@ -131,6 +142,7 @@
       <section class="py-20 sm:py-24 lg:py-32">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="text-center">
+            <!-- Title uses Primary Brand Color -->
             <p
               class="brand-text text-base font-semibold uppercase tracking-wider"
             >
@@ -140,6 +152,7 @@
               class="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
             >
               Organize projects, tasks, and teams.
+              <!-- Gradient uses Brand Color and Accent 2 (from active scheme) -->
               <span class="brand-gradient block bg-clip-text text-transparent">
                 All in one place.
               </span>
@@ -156,9 +169,10 @@
               >
                 Start your 14-day free trial
               </a>
+              <!-- Secondary CTA text uses Accent 1 -->
               <a
                 href="#"
-                class="group flex items-center gap-x-2 text-base font-semibold leading-6 text-slate-700"
+                class="hover-accent-1 group flex items-center gap-x-2 text-base font-semibold leading-6 text-slate-700"
               >
                 Learn more
                 <span class="transition-transform group-hover:translate-x-1"
@@ -174,6 +188,7 @@
       <section id="features" class="bg-white py-20 sm:py-24 lg:py-32">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="lg:text-center">
+            <!-- Subtitle uses Primary Brand Color -->
             <h2
               class="brand-text text-base font-semibold uppercase tracking-wider"
             >
@@ -193,10 +208,11 @@
             <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
               <div class="pt-6">
                 <div
-                  class="flow-root rounded-lg border border-slate-200 bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+                  class="accent-border-1 flow-root rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
                 >
                   <div class="-mt-6">
                     <div>
+                      <!-- Icon uses Primary Brand Color -->
                       <span
                         class="brand-bg inline-flex items-center justify-center rounded-md p-3 shadow-lg"
                       >
@@ -230,7 +246,7 @@
               </div>
               <div class="pt-6">
                 <div
-                  class="flow-root rounded-lg border border-slate-200 bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+                  class="accent-border-1 flow-root h-full rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
                 >
                   <div class="-mt-6">
                     <div>
@@ -267,7 +283,7 @@
               </div>
               <div class="pt-6">
                 <div
-                  class="flow-root rounded-lg border border-slate-200 bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+                  class="accent-border-1 flow-root h-full rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
                 >
                   <div class="-mt-6">
                     <div>
@@ -311,8 +327,9 @@
       <section id="testimonials" class="py-20 sm:py-24 lg:py-32">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="mx-auto max-w-2xl lg:text-center">
+            <!-- Subtitle uses Accent 2 (from active scheme) for high contrast -->
             <h2
-              class="brand-text text-base font-semibold uppercase tracking-wider"
+              class="accent-2-text text-base font-semibold uppercase tracking-wider"
             >
               Don't just take our word for it
             </h2>
@@ -325,6 +342,7 @@
           <div
             class="mx-auto mt-16 grid max-w-lg gap-10 lg:max-w-none lg:grid-cols-2"
           >
+            <!-- Testimonial cards remain neutral -->
             <div
               class="flex flex-col rounded-lg border border-slate-200 bg-white p-8 shadow-sm"
             >
@@ -390,9 +408,10 @@
           <p class="mt-4 text-lg leading-6 text-white opacity-90">
             No credit card required. Cancel anytime.
           </p>
+          <!-- Button text uses Accent 1 -->
           <a
             href="#"
-            class="brand-text mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium transition-colors hover:bg-slate-50 sm:w-auto"
+            class="accent-1-text mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium transition-colors hover:bg-slate-50 sm:w-auto"
           >
             Sign up for free
           </a>
@@ -400,7 +419,7 @@
       </section>
     </main>
 
-    <!-- =========== Footer =========== -->
+    <!-- =========== Footer (No dynamic colors needed here, using slate for contrast) =========== -->
     <footer class="bg-slate-900">
       <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div class="xl:grid xl:grid-cols-3 xl:gap-8">
@@ -603,24 +622,60 @@ definePageMeta({
   layout: 'example',
 })
 
+// Assume useUserColorStore is defined elsewhere and contains settings and currentColor
+declare const useUserColorStore: () => any
+
+const userColorStore = useUserColorStore()
+
 const isMobileMenuOpen = ref(false)
-const currentColor = ref('rgb(79, 70, 229)') // Default indigo-600
+
+// 1. Compute the current mode safely
+const currentMode = computed(
+  () => userColorStore.settings?.mode || 'monochrome'
+)
+
+// Define a robust, comprehensive fallback for the color object
+const FALLBACK_COLOR_DATA = {
+  code: '#3b82f6', // Default brand color
+  matchingColors: {
+    monochrome: [{ code: '#3b82f6' }, { code: '#1e40af' }, { code: '#bfdbfe' }],
+    analogic: [{ code: '#3b82f6' }, { code: '#4f46e5' }, { code: '#ef4444' }],
+    complement: [{ code: '#3b82f6' }, { code: '#facc15' }, { code: '#14b8a6' }],
+    triad: [{ code: '#3b82f6' }, { code: '#f43f5e' }, { code: '#14b8a6' }],
+  },
+}
+
+const currentColor = computed(() => {
+  // Use the stored color, or the full fallback structure
+  return userColorStore.currentColor || FALLBACK_COLOR_DATA
+})
+
+// 2. Select the accent scheme array, guaranteeing it is a valid array of at least 3 items.
+const activeScheme = computed(() => {
+  const mode = currentMode.value
+
+  // Safely attempt to retrieve the scheme for the current mode
+  const colors = currentColor.value.matchingColors?.[mode]
+
+  // Default to the monochrome scheme from the fallback data if the requested mode is missing,
+  // or if the array is incomplete/null (which should prevent the 500 error).
+  const defaultScheme = FALLBACK_COLOR_DATA.matchingColors.monochrome
+
+  if (colors && colors.length >= 3) {
+    return colors
+  }
+
+  // If data is null or incomplete, return a guaranteed safe default
+  return defaultScheme
+})
+
+onMounted(() => {
+  userColorStore.loadFromStorage()
+})
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
-
-onMounted(() => {
-  const stored = localStorage.getItem('currentColor')
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored)
-      currentColor.value = parsed.code
-    } catch (e) {
-      currentColor.value = stored
-    }
-  }
-})
 </script>
 
 <style scoped>
@@ -633,12 +688,29 @@ onMounted(() => {
   background-color: var(--brand-color);
 }
 
+/* --- New Accent 1 Classes (Index 0 of active scheme) --- */
+.accent-1-text {
+  color: var(--accent-1);
+}
+.accent-border-1 {
+  border-color: var(--accent-1);
+}
+.hover-accent-1:hover {
+  color: var(--accent-1);
+}
+
+/* --- New Accent 2 Classes (Index 1 of active scheme) --- */
+.accent-2-text {
+  color: var(--accent-2);
+}
+
 .hover-brand:hover {
   color: var(--brand-color);
 }
 
 .hover-brand-dark:hover {
-  background-color: color-mix(in srgb, var(--brand-color) 85%, black);
+  /* Using Accent 3 (Index 2 of active scheme) */
+  background-color: var(--accent-3);
 }
 
 .focus-ring-brand:focus {
@@ -650,10 +722,11 @@ onMounted(() => {
 }
 
 .brand-gradient {
+  /* Dynamic gradient using the primary brand color and Accent 2 */
   background-image: linear-gradient(
     to right,
     var(--brand-color),
-    color-mix(in srgb, var(--brand-color), #ec4899 50%)
+    var(--accent-2)
   );
 }
 </style>

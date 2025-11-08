@@ -3,12 +3,19 @@ import { defineStore } from 'pinia'
 
 export const useUserColorStore = defineStore('userColor', {
   state: () => ({
+    settings: {} as any,
     history: [] as any[],
     favorites: [] as any[],
     currentColor: {} as any,
   }),
 
   actions: {
+    getSettings(mode = 'monochrome') {
+      this.settings = { mode }
+      this.saveToStorage()
+      return this.settings
+    },
+
     async getCurrentColor() {
       try {
         const response = await axios.get(
@@ -43,6 +50,11 @@ export const useUserColorStore = defineStore('userColor', {
       }
     },
 
+    setCurrentColor(color: any) {
+      this.currentColor = color
+      this.saveToStorage()
+    },
+
     addToFavorites(color: any) {
       this.favorites.push(color)
       this.saveToStorage()
@@ -68,6 +80,7 @@ export const useUserColorStore = defineStore('userColor', {
       localStorage.setItem(
         'userColorStore',
         JSON.stringify({
+          settings: this.settings,
           history: this.history,
           favorites: this.favorites,
           currentColor: this.currentColor,
@@ -83,6 +96,7 @@ export const useUserColorStore = defineStore('userColor', {
       if (!saved) return
 
       const parsed = JSON.parse(saved)
+      this.settings = parsed.settings || { mode: 'monochrome' }
       this.history = parsed.history || []
       this.favorites = parsed.favorites || []
       this.currentColor = parsed.currentColor || {}
