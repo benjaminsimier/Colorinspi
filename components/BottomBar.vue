@@ -37,8 +37,12 @@
           <div class="flex items-center gap-2">
             <!-- TEMPLATE -->
             <div>
-              <a-button type="secondary" @click="useTemplate">
-                {{ templates[0].name }}
+              <a-button type="secondary" @click="templatesModalVisible = true">
+                {{
+                  templates.find(
+                    (i) => i.slug === userColorStore.settings.template
+                  )?.name || templates[0].name
+                }}
               </a-button>
             </div>
 
@@ -57,6 +61,29 @@
       </div>
     </div>
 
+    <!-- TEMPLATE -->
+    <a-modal
+      v-model:visible="templatesModalVisible"
+      :footer="null"
+      :closable="false"
+      centered
+      width="250px"
+      @ok="templatesModalVisible = false"
+    >
+      <div class="flex flex-col gap-2 overflow-scroll">
+        <div v-for="item in templates" :key="item.name">
+          <a-button
+            type="secondary"
+            class="w-full"
+            @click="useTemplate(item.slug)"
+          >
+            {{ item.name }}
+          </a-button>
+        </div>
+      </div>
+    </a-modal>
+
+    <!-- COLOR MODE -->
     <a-modal
       v-model:visible="colorModesModalVisible"
       :footer="null"
@@ -110,6 +137,7 @@
 // get store
 const userColorStore = useUserColorStore()
 
+const templatesModalVisible = ref(false)
 const colorModesModalVisible = ref(false)
 
 const historyModalVisible = ref(false)
@@ -150,20 +178,32 @@ const createColor = async () => {
 const templates = ref([
   {
     name: 'Landing Page',
-    slug: 'landing-page',
+    slug: 'landing',
+  },
+  {
+    name: 'Pricing Page',
+    slug: 'pricing',
+  },
+  {
+    name: 'Product Page',
+    slug: 'product',
+  },
+  {
+    name: 'Blog Post',
+    slug: 'blog-post',
   },
   {
     name: 'Blog',
     slug: 'blog',
   },
-  {
-    name: 'Portfolio',
-    slug: 'portfolio',
-  },
-  {
-    name: 'Resume',
-    slug: 'resume',
-  },
+  //   {
+  //     name: 'Portfolio',
+  //     slug: 'portfolio',
+  //   },
+  //   {
+  //     name: 'Resume',
+  //     slug: 'resume',
+  //   },
 ])
 
 const colorModes = ref([
@@ -185,7 +225,12 @@ const colorModes = ref([
   },
 ])
 
-const useTemplate = (template: string) => {}
+const useTemplate = (template: string) => {
+  // go to template page
+  navigateTo(`/templates/${template}`)
+
+  templatesModalVisible.value = false
+}
 
 const useColorMode = (mode: string) => {
   userColorStore.getSettings(mode)
