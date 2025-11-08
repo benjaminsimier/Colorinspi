@@ -177,11 +177,29 @@
       :data="colorToUse"
       @useMatchingColor="useMatchingColor"
     />
+
+    <!-- FLOATING CTA: DISCOVER TEMPLATES (New Feature) -->
+    <div
+      class="fixed bottom-6 right-6 z-50 transition-transform duration-300 hover:scale-[1.03]"
+      title="See examples and templates using these colors."
+    >
+      <div
+        class="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow-xl transition-all hover:bg-indigo-700"
+        @click="goToTemplate"
+      >
+        <!-- Using LayoutOutlined (Ant Design Icon) for template/design concept -->
+        <layout-outlined style="font-size: 16px" />
+        Discover Templates
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { notification } from 'ant-design-vue'
+
+// Assuming required Ant Design icons (like LayoutOutlined) are available globally
+// or imported elsewhere in the setup script if needed.
 
 useHead({
   titleTemplate: 'Colorinspi',
@@ -268,11 +286,17 @@ const copyToClipboard = async () => {
 const useHistoryColor = (color: any) => {
   colorToUse.value = color
 
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
+
   historyModalVisible.value = false
 }
 
 const useFavorite = (color: any) => {
   colorToUse.value = color
+
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
 
   favoritesModalVisible.value = false
 }
@@ -292,6 +316,9 @@ const useMatchingColor = async (color: any) => {
 
   colorToUse.value = color
 
+  // Update current color in store
+  userColorStore.setCurrentColor(color)
+
   matchingColorsModalVisible.value = false
 }
 
@@ -310,5 +337,9 @@ const addToFavorites = () => {
 
 const removeFromFavorites = (color: any) => {
   userColorStore.removeFromFavorites(color)
+}
+
+const goToTemplate = () => {
+  navigateTo('/templates/landing')
 }
 </script>
