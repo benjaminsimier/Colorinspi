@@ -1,5 +1,5 @@
 <template>
-  <div :style="{ '--brand-color': currentColor }">
+  <div :style="{ '--brand-color': currentColor.code }">
     <!-- =========== Header =========== -->
     <header
       class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-slate-50/80 backdrop-blur-lg"
@@ -603,24 +603,21 @@ definePageMeta({
   layout: 'example',
 })
 
+const userColorStore = useUserColorStore()
+
 const isMobileMenuOpen = ref(false)
-const currentColor = ref('rgb(79, 70, 229)') // Default indigo-600
+
+const currentColor = computed(() => {
+  return userColorStore.currentColor
+})
+
+onMounted(() => {
+  userColorStore.loadFromStorage()
+})
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
-
-onMounted(() => {
-  const stored = localStorage.getItem('currentColor')
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored)
-      currentColor.value = parsed.code
-    } catch (e) {
-      currentColor.value = stored
-    }
-  }
-})
 </script>
 
 <style scoped>
