@@ -246,7 +246,7 @@
               </div>
               <div class="pt-6">
                 <div
-                  class="accent-border-1 flow-root rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+                  class="accent-border-1 flow-root h-full rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
                 >
                   <div class="-mt-6">
                     <div>
@@ -283,7 +283,7 @@
               </div>
               <div class="pt-6">
                 <div
-                  class="accent-border-1 flow-root rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+                  class="accent-border-1 flow-root h-full rounded-lg border bg-slate-50 px-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
                 >
                   <div class="-mt-6">
                     <div>
