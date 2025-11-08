@@ -222,7 +222,7 @@
             <!-- ADD TO FAVORITES -->
             <div class="absolute right-[8px] top-[8px] z-20">
               <a-tooltip
-                title="Add to favorites"
+                title="Remove from favorites"
                 color="#7b6dc4"
                 placement="top"
                 mouseEnterDelay="0.5"
