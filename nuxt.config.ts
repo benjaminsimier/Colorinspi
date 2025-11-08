@@ -5,6 +5,8 @@ import Components from 'unplugin-vue-components/vite'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineNuxtConfig({
+  compatibilityDate: '2025-10-19',
+
   typescript: {
     shim: false,
     strict: false,
@@ -24,6 +26,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
+    '@pinia/nuxt',
   ],
 
   // components: https://go.nuxtjs.dev/config-components
