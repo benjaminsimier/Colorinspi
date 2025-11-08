@@ -23,10 +23,14 @@ export const useUserColorStore = defineStore('userColor', {
 
         const textColor = this.getBestTextColorFromRGB(r, g, b)
 
+        // Get all matching color schemes
+        const matchingColors = await this.getAllColorSchemes(raw.hex.value)
+
         const color = {
           name: raw.name.value,
           code: raw.hex.value,
           text: textColor,
+          matchingColors,
         }
 
         this.currentColor = color
@@ -67,6 +71,8 @@ export const useUserColorStore = defineStore('userColor', {
           history: this.history,
           favorites: this.favorites,
           currentColor: this.currentColor,
+          matchingColors: this.currentColor.matchingColors || [],
+          lastUpdate: Date.now(),
         })
       )
     },
@@ -99,6 +105,49 @@ export const useUserColorStore = defineStore('userColor', {
       const contrastBlack = (luminance + 0.05) / 0.05
 
       return contrastBlack >= contrastWhite ? 'black' : 'white'
+    },
+
+    // -- Helper to get matching colors ---
+    async getMatchingColors(hex: string, count = 3, mode = 'monochrome') {
+      try {
+        const cleanHex = hex.replace('#', '')
+        const query = `?hex=${cleanHex}&mode=${mode}&count=${count}&timestamp=${Date.now()}`
+        const response = await axios.get(
+          `https://www.thecolorapi.com/scheme${query}`
+        )
+
+        return response.data.colors.map((color: any) => ({
+          name: color.name.value,
+          code: color.hex.value,
+          text: this.getBestTextColorFromRGB(
+            color.rgb.r,
+            color.rgb.g,
+            color.rgb.b
+          ),
+        }))
+      } catch (error) {
+        console.error('Failed to get matching colors', error)
+        return []
+      }
+    },
+
+    async getAllColorSchemes(hex: string) {
+      const matchingColors: Record<string, any[]> = {}
+
+      matchingColors.monochrome = await this.getMatchingColors(
+        hex,
+        3,
+        'monochrome'
+      )
+      matchingColors.analogic = await this.getMatchingColors(hex, 3, 'analogic')
+      matchingColors.complement = await this.getMatchingColors(
+        hex,
+        3,
+        'complement'
+      )
+      matchingColors.triad = await this.getMatchingColors(hex, 3, 'triad')
+
+      return matchingColors
     },
   },
 })
