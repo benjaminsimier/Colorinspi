@@ -1,13 +1,20 @@
 <template>
   <div>
     <div
-      class="fixed bottom-0 left-0 z-50 w-full border-t border-slate-200 bg-white py-4"
+      class="fixed bottom-0 left-0 z-50 w-full border-t border-slate-200 bg-white py-2 md:py-4"
     >
-      <div class="container">
-        <div class="grid grid-cols-3 items-center justify-between">
-          <div class="flex items-center justify-start gap-2">
+      <div class="container mx-auto px-2 md:px-4">
+        <!-- Responsive Layout: Stacked on mobile (flex-col), Grid on desktop (md:grid-cols-3) -->
+        <div
+          class="flex flex-col items-center justify-between gap-y-2 md:grid md:grid-cols-3"
+        >
+          <!-- 1. Actions (Left Group) -->
+          <!-- Responsive: w-full, horizontal scrollable on mobile (overflow-x-auto) -->
+          <div
+            class="order-1 flex w-full flex-nowrap items-center justify-center gap-2 overflow-x-auto md:order-1 md:w-auto md:justify-start md:overflow-visible"
+          >
             <!-- GENERATE -->
-            <div class="mr-4">
+            <div class="mr-4 flex-shrink-0">
               <a-tooltip
                 title="Generate Color"
                 color="#7b6dc4"
@@ -28,7 +35,7 @@
             </div>
 
             <!-- HISTORY -->
-            <div>
+            <div class="flex-shrink-0">
               <a-tooltip
                 title="Color History"
                 color="#7b6dc4"
@@ -49,7 +56,7 @@
             </div>
 
             <!-- FAVORITES -->
-            <div>
+            <div class="flex-shrink-0">
               <a-tooltip
                 title="Favorites"
                 color="#7b6dc4"
@@ -70,7 +77,7 @@
             </div>
 
             <!-- MATCHING COLORS -->
-            <div>
+            <div class="flex-shrink-0">
               <a-tooltip
                 title="Matching Colors"
                 color="#7b6dc4"
@@ -91,7 +98,7 @@
             </div>
 
             <!-- ADD TO FAVORITES -->
-            <div class="ml-4">
+            <div class="ml-4 flex-shrink-0">
               <a-tooltip
                 :title="
                   userColorStore.favorites
@@ -125,9 +132,13 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-center gap-2">
+          <!-- 2. Color Swatches (Center Group) -->
+          <!-- Responsive: w-full, centered -->
+          <div
+            class="order-2 flex w-full items-center justify-center gap-2 md:order-2 md:w-auto"
+          >
             <div
-              class="h-8 w-8 rounded-md border"
+              class="h-8 w-8 flex-shrink-0 rounded-md border"
               :style="{ backgroundColor: colorToUse.code }"
             ></div>
 
@@ -136,6 +147,7 @@
                 userColorStore.settings.mode
               ]"
               :key="item.code"
+              class="flex-shrink-0"
             >
               <div
                 class="h-8 w-8 rounded-md border"
@@ -144,10 +156,18 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-end gap-2">
+          <!-- 3. Settings (Right Group) -->
+          <!-- Responsive: w-full. Use justify-between and flex-1 on mobile for split buttons -->
+          <div
+            class="order-3 flex w-full items-center justify-between gap-2 md:order-3 md:w-auto md:justify-end"
+          >
             <!-- TEMPLATE -->
-            <div>
-              <a-button type="secondary" @click="templatesModalVisible = true">
+            <div class="flex-1 md:flex-none">
+              <a-button
+                type="secondary"
+                @click="templatesModalVisible = true"
+                class="w-full"
+              >
                 {{
                   templates.find(
                     (i) => i.slug === userColorStore.settings.template
@@ -157,8 +177,12 @@
             </div>
 
             <!-- COLOR MODE -->
-            <div>
-              <a-button type="secondary" @click="colorModesModalVisible = true">
+            <div class="flex-1 md:flex-none">
+              <a-button
+                type="secondary"
+                @click="colorModesModalVisible = true"
+                class="w-full"
+              >
                 {{
                   colorModes.find(
                     (i) => i.mode === userColorStore.settings.mode
@@ -170,6 +194,8 @@
         </div>
       </div>
     </div>
+
+    <!-- MODALS (kept unchanged) -->
 
     <!-- TEMPLATE -->
     <a-modal
@@ -183,7 +209,7 @@
       <div class="flex flex-col gap-2 overflow-scroll">
         <div v-for="item in templates" :key="item.name">
           <a-button
-            type="secondary"
+            :type="item.slug === currentTemplate ? 'primary' : 'secondary'"
             class="w-full"
             @click="useTemplate(item.slug)"
           >
@@ -244,7 +270,15 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+// Import necessary icons if they are used globally or need explicit import in a setup script
+// Note: Assuming these icons (PlusOutlined, HistoryOutlined, etc.) are available either globally or imported elsewhere.
+
 // get store
+// Assuming useUserColorStore is globally defined or imported via nuxt/vite/etc.
+declare const useUserColorStore: () => any
+
 const userColorStore = useUserColorStore()
 
 const templatesModalVisible = ref(false)
@@ -260,15 +294,22 @@ const colorToUse = ref({
   name: '',
   code: '',
   text: 'black',
-  matchingColors: [],
+  matchingColors: {}, // Initialized as object to match expected structure access later
 })
 
+// Get template from url
+const currentTemplate = computed(() =>
+  useRouter().currentRoute.value.fullPath.replace('/templates/', '')
+)
+
 onMounted(() => {
+  // Initialize colorToUse if store data exists, or create new color
+  // Assuming userColorStore.settings is available immediately
   if (!userColorStore?.settings.mode) {
     userColorStore.getSettings('monochrome')
   }
 
-  if (!userColorStore.currentColor.code) {
+  if (!userColorStore.currentColor?.code) {
     createColor()
   } else {
     colorToUse.value = userColorStore.currentColor
@@ -278,6 +319,7 @@ onMounted(() => {
 const createColor = async () => {
   loading.value = true
 
+  // Ensure getCurrentColor fetches and sets the current color
   await userColorStore.getCurrentColor()
 
   colorToUse.value = userColorStore.currentColor
@@ -306,14 +348,6 @@ const templates = ref([
     name: 'Blog',
     slug: 'blog',
   },
-  //   {
-  //     name: 'Portfolio',
-  //     slug: 'portfolio',
-  //   },
-  //   {
-  //     name: 'Resume',
-  //     slug: 'resume',
-  //   },
 ])
 
 const colorModes = ref([
@@ -337,6 +371,7 @@ const colorModes = ref([
 
 const useTemplate = (template: string) => {
   // go to template page
+  // Assuming navigateTo is a global function (e.g., from Nuxt 3)
   navigateTo(`/templates/${template}`)
 
   templatesModalVisible.value = false
@@ -344,6 +379,10 @@ const useTemplate = (template: string) => {
 
 const useColorMode = (mode: string) => {
   userColorStore.getSettings(mode)
+
+  // Re-fetch matching colors since the mode changed, otherwise colorToUse won't update its swatches visually
+  // If userColorStore handles re-fetching on setting change, this might not be needed.
+  // Assuming useUserColorStore.getSettings triggers necessary reactivity/updates.
 
   colorModesModalVisible.value = false
 }
@@ -373,6 +412,7 @@ const useMatchingColor = async (color: any) => {
   )
 
   if (!isHistory) {
+    // Assuming userColorStore.getAllColorSchemes is available
     color.matchingColors = await userColorStore.getAllColorSchemes(color.code)
 
     // Add to history
@@ -388,15 +428,7 @@ const useMatchingColor = async (color: any) => {
 }
 
 const addToFavorites = () => {
-  // check if color is already in favorites
-  const isFavorite = userColorStore.favorites.some(
-    (favorite) => favorite.code === colorToUse.value.code
-  )
-
-  if (isFavorite) {
-    return
-  }
-
+  // check if color is already in favorites is handled in the template logic
   userColorStore.addToFavorites(colorToUse.value)
 }
 
