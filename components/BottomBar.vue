@@ -138,8 +138,9 @@
             class="order-2 flex w-full items-center justify-center gap-2 md:order-2 md:w-auto"
           >
             <div
-              class="h-8 w-8 flex-shrink-0 rounded-md border"
+              class="h-8 w-8 flex-shrink-0 rounded-md border cursor-pointer active:scale-[90%]"
               :style="{ backgroundColor: colorToUse.code }"
+              @click="copyToClipboard(colorToUse)"
             ></div>
 
             <div
@@ -150,8 +151,9 @@
               class="flex-shrink-0"
             >
               <div
-                class="h-8 w-8 rounded-md border"
+                class="h-8 w-8 cursor-pointer rounded-md border active:scale-[90%]"
                 :style="{ backgroundColor: item.code }"
+                @click="copyToClipboard(item)"
               ></div>
             </div>
           </div>
@@ -270,13 +272,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
-// Import necessary icons if they are used globally or need explicit import in a setup script
-// Note: Assuming these icons (PlusOutlined, HistoryOutlined, etc.) are available either globally or imported elsewhere.
+import { notification } from 'ant-design-vue'
 
 // get store
-// Assuming useUserColorStore is globally defined or imported via nuxt/vite/etc.
 declare const useUserColorStore: () => any
 
 const userColorStore = useUserColorStore()
@@ -434,5 +432,27 @@ const addToFavorites = () => {
 
 const removeFromFavorites = (color: any) => {
   userColorStore.removeFromFavorites(color)
+}
+
+const copyToClipboard = async (color: any) => {
+  try {
+    await navigator.clipboard.writeText(color.code)
+
+    notification['success']({
+      message: 'Copied to Clipboard!',
+      description:
+        'Color code copied to clipboard! You can now paste it anywhere you like.',
+      duration: 3,
+      closeIcon: false,
+    })
+  } catch (err) {
+    notification['error']({
+      message: 'Copy Failed',
+      description:
+        'Oops! Something went wrong and we could not copy the color code to your clipboard.',
+      duration: 3,
+      closeIcon: false,
+    })
+  }
 }
 </script>
